@@ -1,5 +1,16 @@
 const {Transformer} = require("@parcel/plugin");
-const {toWoff, toSfnt} = require("woff-tools");
+const {toWoff: ttfToWoff, toSfnt: woffToTtf} = require("woff-tools");
+const {decode: woff2ToTtf, encode: ttfToWoff2} = require("woff2");
+
+const supportedFormats = ["otf", "ttf", "woff", "woff2"];
+
+function isSupportedFormat(type) {
+    return supportedFormats.includes(type);
+}
+
+function isTrueTypeFont(type) {
+    return ["ttf", "otf"].includes(type);
+}
 
 function getTransformer(sourceType, targetType) {
     if (sourceType === targetType) {
@@ -7,29 +18,49 @@ function getTransformer(sourceType, targetType) {
     }
 
     if (targetType === "woff") {
-        return toWoff;
+        if (sourceType === "woff2") {
+            return (woff2Buffer) => ttfToWoff(woff2ToTtf(woff2Buffer));
+        }
+
+        return ttfToWoff;
     }
 
-    if (targetType === "ttf" || targetType === "otf") {
-        if (sourceType !== "woff") {
+    if (targetType === "woff2") {
+        if (sourceType === "woff") {
+            return (woffBuffer) => ttfToWoff2(woffToTtf(woffBuffer));
+        }
+
+        if (isTrueTypeFont(sourceType)) {
+            return ttfToWoff2;
+        }
+    }
+
+    if (isTrueTypeFont(targetType)) {
+        if (isTrueTypeFont(sourceType)) {
             return null;
         }
 
-        return toSfnt;
+        if (sourceType === "woff") {
+            return woffToTtf;
+        }
+
+        if (sourceType === "woff2") {
+            return woff2ToTtf;
+        }
     }
 
-    throw new Error("unsupported required file type");
+    throw new Error(`no transformer found to process ${sourceType} to ${targetType}`);
 }
 
 module.exports = new Transformer({
     async transform({asset}) {
-        if (!asset.query.has("as")) {
+        if (!isSupportedFormat(asset.type) || !asset.query.has("as")) {
             return [asset];
         }
 
         const requiredType = asset.query.get("as");
 
-        if (!["otf", "ttf", "woff"].includes(requiredType)) {
+        if (!isSupportedFormat(requiredType)) {
             throw new Error("unsupported required file type");
         }
 
@@ -37,6 +68,7 @@ module.exports = new Transformer({
 
         asset.type = requiredType;
 
+        // There is no transformation required
         if (transformer === null) {
             return [asset];
         }

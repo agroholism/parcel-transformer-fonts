@@ -1,6 +1,6 @@
 {
   "name": "parcel-transformer-fonts",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "This plugin for Parcel can be used to easily convert fonts to desired formats.",
   "main": "index.js",
   "type": "commonjs",
@@ -24,6 +24,7 @@
   "license": "WTFPL",
   "dependencies": {
     "@parcel/plugin": "^2.6.2",
-    "woff-tools": "^0.1.0"
+    "woff-tools": "^0.1.0",
+    "woff2": "^1.0.0"
   }
 }
