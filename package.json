@@ -1,6 +1,6 @@
 {
   "name": "parcel-transformer-fonts",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "This plugin for Parcel can be used to easily convert fonts to desired formats.",
   "main": "index.js",
   "type": "commonjs",

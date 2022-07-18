@@ -11,6 +11,10 @@ function getTransformer(sourceType, targetType) {
     }
 
     if (targetType === "ttf" || targetType === "otf") {
+        if (sourceType !== "woff") {
+            return null;
+        }
+
         return toSfnt;
     }
 
@@ -31,6 +35,8 @@ module.exports = new Transformer({
 
         const transformer = getTransformer(asset.type, requiredType);
 
+        asset.type = requiredType;
+
         if (transformer === null) {
             return [asset];
         }
@@ -39,8 +45,6 @@ module.exports = new Transformer({
         const result = transformer(buffer);
 
         asset.setBuffer(result);
-
-        asset.type = requiredType;
 
         return [asset];
     }
