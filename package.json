@@ -15,7 +15,7 @@
   "engines": {
     "parcel": "*"
   },
-  "keywords": [],
+  "keywords": ["parcel", "parcel-plugin", "font", "ttf", "woff", "woff2"],
   "author": {
     "name": "Denis Tsvikevich",
     "email": "dtsvikevich@mail.ru",
