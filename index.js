@@ -1,6 +1,5 @@
 const {Transformer} = require("@parcel/plugin");
-const {toWoff: ttfToWoff, toSfnt: woffToTtf} = require("woff-tools");
-const {decode: woff2ToTtf, encode: ttfToWoff2} = require("woff2");
+const {ttfToWoff, ttfToWoff2, woffToTtf, woff2ToTtf} = require("./transformers.js");
 
 const supportedFormats = ["otf", "ttf", "woff", "woff2"];
 
@@ -19,7 +18,7 @@ function getTransformer(sourceType, targetType) {
 
     if (targetType === "woff") {
         if (sourceType === "woff2") {
-            return (woff2Buffer) => ttfToWoff(woff2ToTtf(woff2Buffer));
+            return async (woff2Buffer) => await ttfToWoff(await woff2ToTtf(woff2Buffer));
         }
 
         return ttfToWoff;
@@ -27,7 +26,7 @@ function getTransformer(sourceType, targetType) {
 
     if (targetType === "woff2") {
         if (sourceType === "woff") {
-            return (woffBuffer) => ttfToWoff2(woffToTtf(woffBuffer));
+            return async (woffBuffer) => await ttfToWoff2(await woffToTtf(woffBuffer));
         }
 
         if (isTrueTypeFont(sourceType)) {
@@ -74,7 +73,7 @@ module.exports = new Transformer({
         }
 
         const buffer = await asset.getBuffer();
-        const result = transformer(buffer);
+        const result = await transformer(buffer);
 
         asset.setBuffer(result);
 
